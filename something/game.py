@@ -7,8 +7,8 @@ def user():
     stream_info = pylsl.resolve_stream()
     inlet = StreamInlet(stream_info[0], max_chunklen=750)
     model = neural_network_training()
-    global r1
-    while True:
+    exist = True
+    while exist:
         chunk, t_ = inlet.pull_chunk(timeout=3)
         chunk = chunk[:650]
         x = np.expand_dims(chunk, axis=0)
@@ -29,8 +29,8 @@ def user1():
     stream_info = pylsl.resolve_stream()
     inlet = StreamInlet(stream_info[1], max_chunklen=750)
     model = neural_network_training()
-    global r1
-    while True:
+    exist = True
+    while exist:
         chunk, t_ = inlet.pull_chunk(timeout=3)
         chunk = chunk[:650]
         x = np.expand_dims(chunk, axis=0)
@@ -48,7 +48,7 @@ def user1():
         print("user1 " + str(np.where(res[0] == max(res[0]))[0][0]))
 
 stream_info = pylsl.resolve_stream()
-
+print(stream_info)
 inlet1 = StreamInlet(stream_info[1], max_chunklen=750)
 # thr = threading.Thread(target=user, args=())
 # thr1 = threading.Thread(target=user1, args=())
@@ -98,9 +98,11 @@ thr1.start()
 
 while 1:
     clock.tick(250)
+    global exist
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
+            exist = False
             sys.exit()
         # if event.type == pygame.KEYDOWN and event.key == pygame.K_w:
         #     if r[1] > 0:
@@ -126,9 +128,11 @@ while 1:
             count0 = random.choice((-a0, a0))
             count1 = random.choice((-a1, a1))
             score1 = 0
+            pygame.draw.rect(s, (0, 0, 0), [800, 0, 900, 60])
             f = font.render(str(score1), 1, (255, 255, 255), (0, 0, 0))
             s.blit(f, (770, 5))
             score0 = 0
+            pygame.draw.rect(s, (0, 0, 0), [100, 0, 600, 60])
             f = font.render(str(score0), 1, (255, 255, 255), (0, 0, 0))
             s.blit(f, (700, 5))
             f = font.render('Winner', 1, (0, 0, 0), (0, 0, 0))
@@ -143,7 +147,6 @@ while 1:
             pygame.draw.rect(s, (200, 100, 55), r)
             pygame.draw.circle(s, (0, 0, 0), c, rad)
             c = [w / 2, h / 2]
-
     if c[1] == h - rad:
         count1 = -a1
     elif c[1] == rad:
@@ -176,8 +179,8 @@ while 1:
             pygame.draw.circle(s, (0, 0, 0), c, rad)
             c = [w / 2, h / 2]
             count0 = random.choice((-a0, a0))
-            count1 = random.choice((-a1,a1))
-            score1 +=1
+            count1 = random.choice((-a1, a1))
+            score1 += 1
             if score1 != 10:
                 f = font.render(str(score1), 1, (255, 255, 255), (0, 0, 0))
                 s.blit(f, (770, 5))

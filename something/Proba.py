@@ -85,14 +85,29 @@ def neural_network_training():
         chunk_arr = pickle.load(file)
     with open('data2.bin', mode='rb') as f:
         chunk_res = pickle.load(f)
+    # model = Sequential([
+    #     Conv1D(32, 30, activation='sigmoid', padding='same', input_shape=(650, 30)),
+    #     BatchNormalization(),
+    #     MaxPooling1D(pool_size=2),
+    #     Conv1D(64, 30, activation='tanh', padding='same'),
+    #     BatchNormalization(),
+    #     MaxPooling1D(pool_size=2),
+    #     Conv1D(64, 30, activation='sigmoid'),
+    #     # BatchNormalization(),
+    #     MaxPooling1D(pool_size=2),
+    #     Flatten(),
+    #     Dense(128, activation='linear'),
+    #     # BatchNormalization(),
+    #     Dense(3, activation='softmax'),
+    # ])
     model = Sequential([
-        Conv1D(32, 30, activation='sigmoid', padding='same', input_shape=(650, 30)),
+        Conv1D(32, 30, activation='linear', padding='same', input_shape=(650, 30)),
         BatchNormalization(),
         MaxPooling1D(pool_size=2),
-        Conv1D(64, 30, activation='tanh', padding='same'),
+        Conv1D(64, 30, activation='linear', padding='same'),
         BatchNormalization(),
         MaxPooling1D(pool_size=2),
-        Conv1D(64, 30, activation='sigmoid'),
+        Conv1D(64, 30, activation='linear'),
         # BatchNormalization(),
         MaxPooling1D(pool_size=2),
         Flatten(),
@@ -102,13 +117,15 @@ def neural_network_training():
     ])
     chunk_res = keras.utils.to_categorical(chunk_res, 3)
     chunk_arr = np.expand_dims(chunk_arr, axis=0)
+
     b, a = sgn.butter(3, (8, 13), btype='bandpass', fs=250)
 
     zi = numpy.zeros((1, 300, 650, max(len(a), len(b)) - 1))
 
     chunk_arr, zi = sgn.lfilter(b, a, chunk_arr, zi=zi)
+
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(chunk_arr[0], chunk_res, epochs=15, validation_split=0.2)
+    model.fit(chunk_arr[0], chunk_res, epochs=25, validation_split=0.2)
     return model
 
 
