@@ -18,13 +18,30 @@ from keras.models import Sequential
 from keras.layers import MaxPooling1D, BatchNormalization
 from tensorflow.keras.layers import Dense, Flatten, Dropout, Conv2D, MaxPooling2D, Conv1D
 
-stream_info = pylsl.resolve_stream()
-inlet = StreamInlet(stream_info[0], max_chunklen=750)
+# stream_info = pylsl.resolve_stream()
+# inlet = StreamInlet(stream_info[0], max_chunklen=750)
 
+# chunk_arr = []
+# chunk_res = []
+# chunk_r = [1]
 with open('data.bin', mode='rb') as file:
     chunk_arr = pickle.load(file)
-with open('data2.bin', mode='rb') as f:
+with open('data2.bin',mode='rb') as f:
     chunk_res = pickle.load(f)
+
+# # ---------------------------------
+# b, a = sgn.butter(3, (8, 13), btype='bandpass', fs=250)
+# zi = numpy.zeros((max(len(a), len(b)) - 1, 30))
+# for x in range(50):
+#     chunk, t_ = inlet.pull_chunk(timeout=3)  # Chunk [750x31(?)]
+#     chunk = chunk[:650]
+#     chunk = sgn.lfilter(b, a, chunk, axis=0)
+#     chunk_arr.append(chunk)
+#     chunk_res.append(chunk_r)
+# with open('data.bin', mode='wb') as file:
+#     pickle.dump(chunk_arr, file)
+# with open('data2.bin', mode='wb') as file:
+#     pickle.dump(chunk_res,file)
 
 chunk_res = keras.utils.to_categorical(chunk_res, 3)
 chunk_arr = np.expand_dims(chunk_arr, axis=0)
@@ -32,13 +49,12 @@ chunk_arr = np.expand_dims(chunk_arr, axis=0)
 chunk_arr = chunk_arr[0, :, :, :]
 print(chunk_arr.shape)
 b, a = sgn.butter(3, (8, 13), btype='bandpass', fs=250)
-zi = numpy.zeros((max(len(a), len(b)) - 1, 30))
 
-plt.plot(chunk_arr[53])
+plt.plot(chunk_arr[3])
 plt.show()
 for i in range(chunk_arr.shape[0]):
     chunk_arr[i] = sgn.lfilter(b, a, chunk_arr[i], axis=0)
-plt.plot(chunk_arr[53])
+plt.plot(chunk_arr[3])
 plt.show()
 # plt.plot(chunk_arr[0][0])
 # plt.title('before')
@@ -54,7 +70,7 @@ plt.show()
 # plt.title('after')
 # plt.show()
 # print(chunk_arr.shape)
-chunk_arr = chunk_arr.reshape(300, 30, 650)
+chunk_arr = chunk_arr.reshape(chunk_arr.shape[0], 30, 650)
 # plt.plot(chunk_arr[0][0])
 # plt.title('after')
 # plt.show()
@@ -72,7 +88,7 @@ print(len(chunk_res))
 checkpointer = ModelCheckpoint(filepath='data/checkpoint.h5', verbose=1,
                                save_best_only=True)
 class_weights = {0: 1, 1: 1, 2: 1}
-history = model.fit(chunk_arr, chunk_res, epochs=300, validation_split=0.2, class_weight=class_weights,
+history = model.fit(chunk_arr, chunk_res, epochs=50, validation_split=0.2, class_weight=class_weights,
                     callbacks=[checkpointer], batch_size = 16)
 model.load_weights('data/checkpoint.h5')
 plt.plot(history.history['accuracy'])
