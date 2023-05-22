@@ -9,7 +9,7 @@ import numpy as np
 import keras
 from matplotlib import pyplot as plt
 
-from EEGModels import EEGNet, ShallowConvNet, DeepConvNet
+from EEGModels import EEGNet, ShallowConvNet, DeepConvNet, EEGNet_SSVEP
 
 from tensorflow.keras.datasets import mnist
 from tensorflow import keras
@@ -76,7 +76,7 @@ plt.title('after')
 plt.show()
 print(chunk_arr.shape)
 
-model = EEGNet(nb_classes = 3, Chans = 30, Samples = 650,
+model = EEGNet_SSVEP(nb_classes = 3, Chans = 30, Samples = 650,
                dropoutRate = 0.5,  kernLength = 32, F1 = 8, D = 2, F2 = 16,
                dropoutType = 'Dropout')
 print(model.summary())
@@ -89,7 +89,7 @@ checkpointer = ModelCheckpoint(filepath='data/checkpoint.h5', verbose=1,
                                save_best_only=True)
 class_weights = {0: 1, 1: 1, 2: 1}
 history = model.fit(chunk_arr, chunk_res, epochs=350, validation_split=0.2, class_weight=class_weights,
-                    callbacks=[checkpointer], batch_size = 16)
+                    callbacks=[checkpointer], batch_size = 2, shuffle=True)
 model.load_weights('data/checkpoint.h5')
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])

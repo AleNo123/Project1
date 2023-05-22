@@ -53,7 +53,7 @@ chunk_arr = chunk_arr.reshape(chunk_arr.shape[0], 14, 740)
 plt.plot(chunk_arr[3])
 plt.show()
 model = EEGNet(nb_classes=3, Chans=14, Samples=740,
-               dropoutRate=0.5, kernLength=2, F1=16, D=4, F2=64,
+               dropoutRate=0.5, kernLength=32, F1=16, D=4, F2=64,
                dropoutType='Dropout')
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 checkpointer = ModelCheckpoint(filepath='data/checkpoint_sdf.h5', verbose=1,
