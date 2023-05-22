@@ -17,7 +17,6 @@ data = data_array['recording_data'][:,:]
 signs = data_array['signs'][0,:]
 print(data.shape)
 print(signs.shape)
-print(signs)
 b, a = sgn.butter(3, (13, 31), btype='bandpass', fs=250)
 zi = numpy.zeros((max(len(a), len(b)) - 1, 30))
 data = sgn.lfilter(b, a, data, axis=0)
@@ -32,10 +31,10 @@ for i in signs:
     if i!= check:
         # print(data[:,:num])
         # print(data[:, :num].shape)
-        if i == 2 and ok!=0:
+        if i == 2 and ok>1:
             num = 0
             check = i
-        elif i == 0 and ok2!=0:
+        if i == 0 and ok2!=0:
             num = 0
             check = i
         else:
@@ -44,13 +43,14 @@ for i in signs:
             # print(str(num)+', '+str(i))
             num=0
             if i == 2:
-                ok = 1
+                ok +=1
             if i == 0:
                 ok2 = 1
             check =i
     else:
         num+=1
 chunk_arr = np.array(chunk_arr)
+print()
 chunk_res = keras.utils.to_categorical(chunk_res, 3)
 b, a = sgn.butter(3, (8, 13), btype='bandpass', fs=250)
 print(chunk_arr.shape)
@@ -72,7 +72,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 checkpointer = ModelCheckpoint(filepath='data/checkpoint_sdf.h5', verbose=1,
                                save_best_only=True)
 class_weights = {0: 1, 1: 1, 2: 1}
-history = model.fit(chunk_arr, chunk_res, epochs=200, validation_split=0.8, class_weight=class_weights,
+history = model.fit(chunk_arr, chunk_res, epochs=20, validation_split=0.8, class_weight=class_weights,
                     callbacks=[checkpointer], batch_size = 1)
 model.load_weights('data/checkpoint_sdf.h5')
 # plt.plot(history.history['accuracy'])
