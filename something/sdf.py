@@ -50,8 +50,10 @@ for i in range(chunk_arr.shape[0]):
 plt.plot(chunk_arr[3])
 plt.show()
 chunk_arr = chunk_arr.reshape(chunk_arr.shape[0], 14, 740)
+plt.plot(chunk_arr[3])
+plt.show()
 model = EEGNet(nb_classes=3, Chans=14, Samples=740,
-               dropoutRate=0.5, kernLength=8, F1=16, D=2, F2=32,
+               dropoutRate=0.5, kernLength=2, F1=16, D=4, F2=64,
                dropoutType='Dropout')
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 checkpointer = ModelCheckpoint(filepath='data/checkpoint_sdf.h5', verbose=1,
@@ -75,20 +77,17 @@ plt.xlabel('epoch')
 plt.legend(['loss', 'val_loss'], loc='upper left')
 plt.show()
 
-data_array1 = loadmat('data/record_data_7.mat')
-data1 = data_array['recording_data'][:,:]
-signs1 = data_array['signs'][0,:]
+data_array1 = loadmat('data/record_data_12.mat')
+data1 = data_array1['recording_data'][:,:]
+signs1 = data_array1['signs'][0,:]
 chunk_arr1=[]
 chunk_res1=[]
 num=0
 check=1
 for i in signs1:
     if i!= check:
-        # print(data[:,:num])
-        # print(data[:, :num].shape)
         chunk_arr1.append(data1[:,:740])
         chunk_res1.append(i)
-        # print(str(num)+', '+str(i))
         num=0
         check =i
     else:
@@ -100,6 +99,7 @@ for i in range(chunk_arr1.shape[0]):
 chunk_arr1 = chunk_arr1.reshape(chunk_arr1.shape[0], 14, 740)
 probs  = model.predict(chunk_arr1)
 num =0
+print(probs)
 for i in probs:
-    print(str(np.where(probs[num] == max(probs[num]))[0])+',  '+str(chunk_res1[num]))
+    print(str(np.where(probs[num] == max(probs[num]))[0])+',  '+str(chunk_res1[num])+',  '+str(probs[num]))
     num+=1
