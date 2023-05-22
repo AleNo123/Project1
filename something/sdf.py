@@ -27,6 +27,7 @@ check=1
 chunk_arr=[]
 chunk_res=[]
 ok = 0
+ok2 = 0
 for i in signs:
     if i!= check:
         # print(data[:,:num])
@@ -34,12 +35,18 @@ for i in signs:
         if i == 2 and ok!=0:
             num = 0
             check = i
+        elif i == 0 and ok2!=0:
+            num = 0
+            check = i
         else:
             chunk_arr.append(data[:,:650])
             chunk_res.append(i)
             # print(str(num)+', '+str(i))
             num=0
-            ok = 1
+            if i == 2:
+                ok = 1
+            if i == 0:
+                ok2 = 1
             check =i
     else:
         num+=1
