@@ -34,7 +34,7 @@ for i in signs:
         if i == 2 and ok>1:
             num = 0
             check = i
-        if i == 0 and ok2!=0:
+        elif i == 0 and ok2!=0:
             num = 0
             check = i
         else:
@@ -50,7 +50,7 @@ for i in signs:
     else:
         num+=1
 chunk_arr = np.array(chunk_arr)
-print()
+print(chunk_res)
 chunk_res = keras.utils.to_categorical(chunk_res, 3)
 b, a = sgn.butter(3, (8, 13), btype='bandpass', fs=250)
 print(chunk_arr.shape)
@@ -73,7 +73,7 @@ checkpointer = ModelCheckpoint(filepath='data/checkpoint_sdf.h5', verbose=1,
                                save_best_only=True)
 class_weights = {0: 1, 1: 1, 2: 1}
 history = model.fit(chunk_arr, chunk_res, epochs=20, validation_split=0.8, class_weight=class_weights,
-                    callbacks=[checkpointer], batch_size = 1)
+                    callbacks=[checkpointer], batch_size = 1, shuffle=True)
 model.load_weights('data/checkpoint_sdf.h5')
 # plt.plot(history.history['accuracy'])
 # plt.plot(history.history['val_accuracy'])
